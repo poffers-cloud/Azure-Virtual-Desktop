@@ -38,9 +38,6 @@ param tags object = {
   LastDeployedBy: updatedBy
 }
 
-//parameters for the existing subscription.
-param existingSubscriptionId string 
-
 //parameters for the existing resource group.
 param existingResourceGroupName string 
 

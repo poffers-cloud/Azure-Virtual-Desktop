@@ -45,26 +45,56 @@ if ($deploy) {
         Write-Host "Bicep deployment completed successfully. Proceeding with WVD Host Pool creation..." -ForegroundColor Green
 
         $resourceGroupName = "rg-$productType-$environmentType-$locationShortCode"
-        $hostPoolName = "vdpool-dynamic-$locationShortCode"
-        $vaultName = "kv-dynamic-$productType-$environmentType-$locationShortCode"
+        $hostPoolName = "vdpool-conf-$productType-$environmentType-$locationShortCode"
+        $workspaceName = "vdws-conf-$productType-$environmentType-$locationShortCode"
+        $applicationGroupName = "vdag-conf-$productType-$environmentType-$locationShortCode"
+        
+        $vaultName = "kv-conf-$productType-$environmentType-$locationShortCode"
         $vnetName = "vnet-$productType-$environmentType-$locationShortCode"
         $subnetName = "snet-$productType"
 
+        # Create Host Pool  
         $parameters = @{
-            Name                 = $hostPoolName
-            ResourceGroupName    = $resourceGroupName
-            ManagementType       = "Automated"
-            HostPoolType         = "Pooled"
+            Name                  = $hostPoolName
+            ResourceGroupName     = $resourceGroupName
+            ManagementType        = "Automated"
+            StartVMOnConnect      = $true
+            HostPoolType          = "Pooled"
             PreferredAppGroupType = "Desktop"
-            LoadBalancerType     = "BreadthFirst"
-            MaxSessionLimit      = 10  # Modify as needed
-            Location             = $location
+            LoadBalancerType      = "BreadthFirst"
+            MaxSessionLimit       = 10
+            Location              = $location
         }
 
         Write-Host "Creating AVD Host Pool..." -ForegroundColor Green        
         New-AzWvdHostPool @parameters
+
+        # Retrieve Host Pool ARM Path  
+        $hostPoolArmPath = (Get-AzWvdHostPool -Name $hostPoolName -ResourceGroupName $resourceGroupName).Id  
+
+        # Create Workspace  
+        $parameters = @{
+            Name              = $workspaceName
+            ResourceGroupName = $resourceGroupName
+            Location         = $location
+        }
+
+        Write-Host "Creating AVD Workspace..." -ForegroundColor Green
+        New-AzWvdWorkspace @parameters
+
+        # Create Application Group  
+        $parameters = @{
+            Name                = $applicationGroupName
+            ResourceGroupName   = $resourceGroupName
+            ApplicationGroupType = 'Desktop'
+            HostPoolArmPath     = $hostPoolArmPath
+            Location           = $location
+        }
+
+        Write-Host "Creating AVD Application Group..." -ForegroundColor Green
+        New-AzWvdApplicationGroup @parameters
         if ($?) {
-            Write-Host "AVD Host Pool created successfully!" -ForegroundColor Green
+            Write-Host "AVD Host Pool with workspace and applicationgroup created successfully!" -ForegroundColor Green
             
             # Define App Registration Object ID
             $appObjectId = "d730c208-a053-4e89-bcac-9e3ad29764f1"
@@ -130,7 +160,6 @@ if ($deploy) {
             }
         }
         
-
                 # Deploy Session Hosts
                 $parameters = @{
                     FriendlyName                                = "avd-$environmentType"

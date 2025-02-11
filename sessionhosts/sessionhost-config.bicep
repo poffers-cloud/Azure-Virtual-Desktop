@@ -66,20 +66,6 @@ module createKeyVault 'br/public:avm/res/key-vault/vault:0.11.2' = {
   name: 'kv-${deploymentGuid}'
   params:{
     name: keyVaultName
-    enableRbacAuthorization:true
-    enableVaultForDeployment:true
-    enableVaultForTemplateDeployment:true
-    networkAcls: {
-      bypass: 'AzureServices'
-      defaultAction: 'Allow'
-      ipRules:  [
-        {
-          value: '108.142.8.17'
-        }
-      ]
-      virtualNetworkRules: []
-    }
-    publicNetworkAccess: 'Disabled'
     secrets: [
       {
         name: 'DomainAdminUser'

@@ -12,9 +12,9 @@ param existingResourceGroupName = 'rg-${productType}-${environmentType}-${locati
 
 //Parameters for the Key Vault 
 param keyVaultName = 'kv-conf-${productType}-${environmentType}-${locationShortCode}'
-param domainAdminPass = 'Ditis33nTest!'
-param domainAdminUser = 'ladm_vmjoin'
-param vmadminPass = 'kdkddk$$1222!!!D'
-param vmAdminUser = 'ladm_admmm'
+param domainAdminPass = ''
+param domainAdminUser = ''
+param vmadminPass = ''
+param vmAdminUser = ''
 
 
